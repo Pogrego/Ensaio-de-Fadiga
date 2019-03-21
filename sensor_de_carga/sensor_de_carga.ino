@@ -4,6 +4,7 @@
   Gustavo Murta   31/maio/2018
   Biblioteca https://github.com/bogde/HX711
   Baseado em https://www.hackster.io/MOHAN_CHANDALURU/hx711-load-cell-amplifier-interface-with-arduino-fa47f3
+  Ultima alteração: 21/03/2019
 */
  
 #include <HX711.h>                    // Biblioteca HX711 
@@ -17,7 +18,7 @@ float current;                        // resultado corrente da leitura
 float previous;                       // resultado anterior da leitura
 float filtered;                       // resultado filtrado da leitura 
 float calibration_factor = 42130;     // fator de calibração para teste inicial
-float noise = 0.01;                   // ruido a ser eliminado pelo filtro
+float noise = 0.2;                   // ruido a ser eliminado pelo filtro
 float error;                          // |current - previous|
  
 void setup()
@@ -34,7 +35,7 @@ void setup()
   balanca.set_scale();                                             // configura a escala da Balança
   zeraBalanca ();                                                  // zera a Balança
   //balanca.set_scale(calibration_factor);                           // ajusta fator de calibração
-  previous = balanca.get_units();
+ //previous = balanca.get_units();
 }
  
 void zeraBalanca ()
@@ -53,11 +54,25 @@ void loop()
   filtered = (error > noise)?current:previous;               // se variação for maior do que o ruido
   
   Serial.print("Peso: ");                                    // imprime no monitor serial
-  Serial.print(current, 3);                                  // imprime peso da balança com 3 casas decimais
+  Serial.print(filtered, 3);                                  // imprime peso da balança com 3 casas decimais
   Serial.print(" kg");
   Serial.print("      Fator de Calibração: ");               // imprime no monitor serial
   Serial.println(calibration_factor);                        // imprime fator de calibração
   previous = filtered;                                       // previous recebe ultima leitura
+
+  /* TESTE DE SENSOR */
+  /*
+  Serial.print("current weight" );  
+  Serial.println(current);
+    Serial.print("previous weight" ); 
+  Serial.println(previous);
+   Serial.print("error" ); 
+  Serial.println(error);
+   Serial.print("noise" ); 
+  Serial.println(noise);
+   Serial.print("filtered weight" ); 
+  Serial.println(filtered);
+  */
   delay(500) ;                                               // atraso de 0,5 segundo
  
   if (Serial.available())                                    // reconhece letra para ajuste do fator de calibração
